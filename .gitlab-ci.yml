@@ -1,0 +1,31 @@
+stages:
+    - test
+    - deploy
+
+stage: test
+  script:
+    - apt-get update -qy
+    - apt-get install -y python-dev python-pip
+    - pip install -U sphinx
+    - pip install sphinx_rtd_theme 
+    - pip install recommonmark
+    
+staging:
+    type: deploy
+    stage: staging
+    image: ruby:latest
+    script:
+        - sphinx-build -b public docs
+        - python -m SimpleHTTPServer
+    only:
+        - documenting
+
+production:
+    type: deploy
+    stage: production
+    image: ruby:latest
+    script:
+        - sphinx-build -b public docs
+        - python -m SimpleHTTPServer
+    only:
+        - master
